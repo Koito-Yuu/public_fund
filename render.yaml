@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: fundscope
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: FUND_DB_URL
+        sync: false
+      - key: TZ
+        value: Asia/Shanghai

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+data/fund.db
+data/fund.db-wal
+data/fund.db-shm
+data/*.log
+data/screens/
+data/type-backup/
+data/market.json
+data/test_*.json
+dist/
+.DS_Store

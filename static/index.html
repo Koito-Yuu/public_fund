@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080a0f">
+  <title>FundScope · 公募基金持仓洞察</title>
+  <script>
+    (function () {
+      try {
+        if (localStorage.getItem("fundscope.theme") === "light") {
+          document.documentElement.dataset.theme = "light";
+        }
+      } catch (error) { /* ignore */ }
+    })();
+  </script>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <link rel="preload" href="/static/vendor/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="modulepreload" href="/static/js/main.js">
+  <link rel="modulepreload" href="/static/js/api.js">
+  <link rel="modulepreload" href="/static/js/store.js">
+  <link rel="modulepreload" href="/static/js/utils.js">
+  <link rel="modulepreload" href="/static/js/charts.js">
+  <link rel="modulepreload" href="/static/js/views/market.js">
+  <link rel="modulepreload" href="/static/js/views/stocks.js">
+  <link rel="modulepreload" href="/static/js/views/fund.js">
+  <link rel="modulepreload" href="/static/js/views/screener.js">
+  <link rel="modulepreload" href="/static/js/views/managers.js">
+  <link rel="modulepreload" href="/static/js/views/portfolio.js">
+  <link rel="modulepreload" href="/static/js/views/funds.js">
+  <link rel="modulepreload" href="/static/js/views/about.js">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="i-market" viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M8 19V5M5 8l3-3 3 3M16 5v14M13 16l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3h8l4 4v14H6V3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M14 3v5h5M9 13h6M9 17h4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m4 12 8 4.5 8-4.5M4 16.5 12 21l8-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+    <symbol id="i-stock" viewBox="0 0 24 24"><path d="M4 18 9 12l4 3 7-9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 6h5v5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M4.5 20c.8-4 3.7-6 7.5-6s6.7 2 7.5 6" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v6M12 7.5v.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.6.8-4 3.9.9 5.5-4.9-2.6-4.9 2.6.9-5.5-4-3.9L9.6 9 12 4Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3 2.8 20h18.4L12 3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 9v5M12 17v.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.1" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 2v2.2M12 19.8V22M2 12h2.2M19.8 12H22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M19.1 4.9l-1.6 1.6M6.5 17.5l-1.6 1.6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+    <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.3A8.2 8.2 0 0 1 9.7 4 8.2 8.2 0 1 0 20 14.3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <div class="app-shell" id="appShell">
+    <aside class="sidebar" id="sidebar">
+      <a class="brand" href="#/market">
+        <span class="brand-mark">
+          <svg viewBox="0 0 32 32" aria-hidden="true">
+            <path d="M6 24V15m6 9V9m6 15v-6m6 6V6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>FundScope</strong>
+          <small>公募持仓洞察</small>
+        </span>
+      </a>
+
+      <div class="nav-label">分析工作台</div>
+      <nav class="nav" id="nav">
+        <a href="#/market" data-nav="market"><svg class="icon"><use href="#i-market"/></svg><span>市场全景</span></a>
+        <a href="#/screener" data-nav="screener"><svg class="icon"><use href="#i-filter"/></svg><span>基金筛选</span></a>
+        <a href="#/funds" data-nav="funds"><svg class="icon"><use href="#i-file"/></svg><span>基金档案</span></a>
+        <a href="#/managers" data-nav="managers"><svg class="icon"><use href="#i-user"/></svg><span>基金经理</span></a>
+        <a href="#/portfolio" data-nav="portfolio"><svg class="icon"><use href="#i-layers"/></svg><span>组合工坊</span></a>
+        <a href="#/stocks" data-nav="stocks"><svg class="icon"><use href="#i-stock"/></svg><span>重仓股透视</span></a>
+      </nav>
+
+      <div class="nav-label second">关于</div>
+      <nav class="nav">
+        <a href="#/about" data-nav="about"><svg class="icon"><use href="#i-info"/></svg><span>数据与方法</span></a>
+      </nav>
+
+      <div class="side-status" id="sideStatus">
+        <div class="status-line"><span class="dot"></span><span>数据引擎在线</span></div>
+        <div class="status-sub" id="sideQuarter">加载中…</div>
+        <div class="status-sub" id="sideCount">—</div>
+      </div>
+    </aside>
+
+    <div class="main-shell">
+      <header class="topbar">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="菜单"><svg class="icon"><use href="#i-menu"/></svg></button>
+        <div class="crumb" id="crumb">市场全景</div>
+
+        <div class="global-search" id="globalSearchWrap">
+          <svg class="icon search-icon"><use href="#i-search"/></svg>
+          <input id="globalSearch" type="text" autocomplete="off" placeholder="搜索基金代码、名称或重仓股" aria-label="全局搜索">
+          <kbd>/</kbd>
+          <div class="search-panel" id="searchPanel"></div>
+        </div>
+
+        <button class="icon-btn theme-btn" id="themeBtn" aria-label="切换浅色 / 深色主题"></button>
+
+        <div class="top-meta">
+          <span class="quarter-pill" id="quarterPill">—</span>
+          <span class="updated-text" id="updatedAt"></span>
+        </div>
+      </header>
+
+      <main id="view" class="view"></main>
+
+      <footer class="app-foot">
+        <span>数据来自公开披露，经本地缓存整理 · 仅用于研究，不构成投资建议</span>
+        <span id="footSource">天天基金 · 东方财富 · 雪球 · 巨潮资讯</span>
+      </footer>
+    </div>
+    <div class="mobile-backdrop" id="mobileBackdrop"></div>
+  </div>
+
+  <div class="toast-root" id="toastRoot"></div>
+  <div id="modalRoot"></div>
+
+  <script src="/static/vendor/echarts.min.js"></script>
+  <script type="module" src="/static/js/main.js"></script>
+</body>
+</html>

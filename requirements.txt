@@ -1,0 +1,8 @@
+Flask>=3.0
+akshare>=1.18
+pandas>=2.0
+numpy>=1.26
+requests>=2.31
+lxml>=5.0
+beautifulsoup4>=4.12
+waitress>=3.0
