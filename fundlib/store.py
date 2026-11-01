@@ -17,8 +17,12 @@ from typing import Any, Iterator
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "fund.db"
 
-# 云上只读缓存模式：忽略 TTL，始终使用已预热的 SQLite 快照，避免境外访问国内行情接口超时
-OFFLINE = os.environ.get("FUND_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
+# 云上只读缓存模式：忽略 TTL，始终使用已预热的 SQLite 快照，避免境外访问国内行情接口超时。
+# 配置了预热库下载地址（FUND_DB_URL）时自动启用。
+OFFLINE = (
+    os.environ.get("FUND_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
+    or bool(os.environ.get("FUND_DB_URL", "").strip())
+)
 
 _write_lock = threading.RLock()
 _initialized = False
