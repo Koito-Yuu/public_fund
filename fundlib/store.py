@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import queue
 import sqlite3
 import threading
@@ -15,6 +16,9 @@ from typing import Any, Iterator
 
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / "data" / "fund.db"
+
+# 云上只读缓存模式：忽略 TTL，始终使用已预热的 SQLite 快照，避免境外访问国内行情接口超时
+OFFLINE = os.environ.get("FUND_OFFLINE", "").strip().lower() in {"1", "true", "yes", "on"}
 
 _write_lock = threading.RLock()
 _initialized = False
@@ -187,7 +191,23 @@ def cache_get(key: str, ttl: float | None = None) -> Any | None:
         ).fetchone()
     if not row:
         return None
-    if ttl is not None and time.time() - row["fetched_at"] > ttl:
+    if ttl is not None and not OFFLINE and time.time() - row["fetched_at"] > ttl:
+        return None
+    try:
+        return json.loads(row["value"])
+    except json.JSONDecodeError:
+        return None
+
+
+def cache_get_prefix(prefix: str) -> Any | None:
+    """取指定前缀下最新的一条缓存，供只读模式在精确键失效时兜底。"""
+    init()
+    with connect() as conn:
+        row = conn.execute(
+            "SELECT value FROM cache WHERE key LIKE ? ORDER BY fetched_at DESC LIMIT 1",
+            (prefix + "%",),
+        ).fetchone()
+    if not row:
         return None
     try:
         return json.loads(row["value"])

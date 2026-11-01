@@ -9,3 +9,5 @@ services:
         sync: false
       - key: TZ
         value: Asia/Shanghai
+      - key: FUND_OFFLINE
+        value: "1"

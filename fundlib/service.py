@@ -232,6 +232,8 @@ def market_payload(quarter: str) -> dict:
         return cached[2]
     cache_key = f"payload:market:v4:{quarter}:{int(ts)}"
     stored = store.cache_get(cache_key, 6 * 3600)
+    if not stored and store.OFFLINE:
+        stored = store.cache_get_prefix(f"payload:market:v4:{quarter}:")
     if stored:
         _market_cache[quarter] = (time.time(), ts, stored)
         return stored
